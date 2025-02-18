@@ -1,51 +1,47 @@
-"use client"
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
+import { useSession, signIn, signOut } from "next-auth/react";
+import { useEffect, useState } from "react";
+import { Toast } from "@/components/customToast";
+import { AuthState } from "@/types";
 
-import { create } from "zustand"
-import { persist } from "zustand/middleware"
-import { AuthState } from "@/types"
-import { useSession, signIn, signOut } from "next-auth/react"
-import { useEffect } from "react"
-import { useToast } from "@/hooks/use-toast"
+const useHydrated = () => {
+    const [hydrated, setHydrated] = useState(false);
+    useEffect(() => setHydrated(true), []);
+    return hydrated;
+};
 
 export const useAuth = create<AuthState>()(
     persist(
         (set) => ({
-            user: null,
-            isAuthenticated: false,
-            isLoading: true,
             hasShownToast: false,
-            setAuth: (user) => set({ user, isAuthenticated: true, isLoading: false }),
-            clearAuth: () => set({ user: null, isAuthenticated: false, isLoading: false }),
-            setHasShownToast: (value) => set({ hasShownToast: value })
-        }), {
-        name: "auth-storage",
-        partialize: (state) => ({ hasShownToast: state.hasShownToast })
-    }
-    ))
+            setHasShownToast: (value) => set({ hasShownToast: value }),
+        }),
+        {
+            name: "auth-storage",
+        }
+    )
+);
 
 export const useSyncAuth = () => {
     const { data: session, status } = useSession();
-    const setAuth = useAuth((state) => state.setAuth)
-    const clearAuth = useAuth((state) => state.clearAuth)
-    const hasShownToast = useAuth((state) => state.hasShownToast)
-    const setHasShownToast = useAuth((state) => state.setHasShownToast)
-    const { toast } = useToast()
+    const hasShownToast = useAuth((state) => state.hasShownToast);
+    const setHasShownToast = useAuth((state) => state.setHasShownToast);
+
+    const hydrated = useHydrated();
 
     useEffect(() => {
-        if (status === "loading") return;
+        if (!hydrated || status === "loading") return;
+
         if (session?.user) {
-            setAuth(session.user)
             if (!hasShownToast) {
-                toast({
-                    title: "Authentication Successful!",
-                    description: "You are logged in successfully.",
-                })
-                setHasShownToast(true)
+                Toast.success("Login Successful!");
+                setHasShownToast(true);
             }
         } else {
-            clearAuth()
-            setHasShownToast(false)
+            setHasShownToast(false);
         }
-    }, [session, status, setAuth, clearAuth, hasShownToast, setHasShownToast])
-    return { signIn, signOut }
-}
+    }, [session, status, hasShownToast, setHasShownToast, hydrated]);
+
+    return { signIn, signOut };
+};

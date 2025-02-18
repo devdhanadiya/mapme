@@ -14,8 +14,9 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { User, Settings, LogOut } from "lucide-react"
 import Loader from "./Loader"
+import { Toast } from "./customToast"
 
-export function ProfileButton() {
+export default function ProfileButton() {
     const { data: session, status } = useSession()
 
     if (status === "loading") {
@@ -28,7 +29,8 @@ export function ProfileButton() {
     }
 
     const handleSignOut = async () => {
-        await signOut()
+        await signOut({ redirect: false })
+        Toast.success("Logout Successful!")
     }
 
     return (

@@ -3,7 +3,7 @@ import { ChildrenProps } from "@/types";
 import { Inter } from "next/font/google"
 import "@/styles/main.css"
 import Provider from "@/Provider";
-import { Toaster } from "@/components/ui/toaster";
+import { ToasterWrapper } from "@/components/customToast";
 
 const inter = Inter({ subsets: ["latin"] })
 export const metadata: Metadata = {
@@ -17,7 +17,7 @@ export default function RootLayout({ children }: Readonly<ChildrenProps>) {
     <html lang="en" className="dark">
       <body className={`${inter.className} bg-background text-foreground antialiased`}>
         <Provider>
-          <Toaster />
+          <ToasterWrapper />
           {children}
         </Provider>
       </body>

@@ -21,8 +21,6 @@
         └── 📁components
             └── Custom-Components
             └── 📁ui
-        └── 📁hooks
-            └── use-toast.ts
         └── 📁lib
             └── auth.ts
             └── prismadb.ts

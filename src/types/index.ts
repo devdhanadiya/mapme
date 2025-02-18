@@ -5,11 +5,12 @@ export interface ChildrenProps {
 }
 
 export interface AuthState {
-    user: any;
-    isAuthenticated: boolean;
-    isLoading: boolean;
     hasShownToast: boolean;
-    setAuth: (user: any) => void;
-    clearAuth: () => void;
     setHasShownToast: (value: boolean) => void
+}
+
+export interface IToast {
+    type: "success" | "error" | "warning";
+    message: string
+    t: { id: string, visible: boolean }
 }

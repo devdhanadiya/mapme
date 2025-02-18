@@ -10,6 +10,11 @@ export const authOptions: NextAuthOptions = {
         Google({
             clientId: process.env.GOOGLE_CLIENT_ID as string,
             clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+            authorization: {
+                params: {
+                    scope: "openid email profile https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email"
+                }
+            }
         })
     ],
     session: {
@@ -27,8 +32,29 @@ export const authOptions: NextAuthOptions = {
         },
     },
     callbacks: {
+        async jwt({ token, account, user }) {
+            if (account?.access_token) {
+                token.accessToken = account.access_token
+
+                await prisma.account.updateMany({
+                    where: { provider: "google", userId: user?.id },
+                    data: {
+                        access_token: account.access_token,
+                        refresh_token: account.refresh_token,
+                        expires_at: account.expires_at
+                    }
+                })
+            }
+            return token;
+        },
         async session({ session, user }) {
             session.user.id = user.id;
+
+            const account = await prisma.account.findFirst({
+                where: { provider: "google", userId: user.id },
+                select: { access_token: true }
+            })
+            session.accessToken = account?.access_token ?? undefined
             return session;
         }
     },
