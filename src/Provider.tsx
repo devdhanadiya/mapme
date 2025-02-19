@@ -1,18 +1,10 @@
 "use client"
+import { SessionProvider } from "next-auth/react"
+import { ProviderProps } from "@/types"
 
-import { ChildrenProps } from "@/types";
-import { SessionProvider } from "next-auth/react";
-import { useSyncAuth } from "@/store/useAuth"
-
-function AuthSync() {
-    useSyncAuth()
-    return null;
-}
-
-export default function Provider({ children }: ChildrenProps) {
+export default function Provider({ children, session }: ProviderProps) {
     return (
-        <SessionProvider>
-            <AuthSync />
+        <SessionProvider session={session}>
             {children}
         </SessionProvider>
     )

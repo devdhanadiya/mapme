@@ -32,31 +32,10 @@ export const authOptions: NextAuthOptions = {
         },
     },
     callbacks: {
-        async jwt({ token, account, user }) {
-            if (account?.access_token) {
-                token.accessToken = account.access_token
-
-                await prisma.account.updateMany({
-                    where: { provider: "google", userId: user?.id },
-                    data: {
-                        access_token: account.access_token,
-                        refresh_token: account.refresh_token,
-                        expires_at: account.expires_at
-                    }
-                })
-            }
-            return token;
-        },
         async session({ session, user }) {
             session.user.id = user.id;
-
-            const account = await prisma.account.findFirst({
-                where: { provider: "google", userId: user.id },
-                select: { access_token: true }
-            })
-            session.accessToken = account?.access_token ?? undefined
             return session;
-        }
+        },
     },
     secret: process.env.NEXTAUTH_SECRET,
 };

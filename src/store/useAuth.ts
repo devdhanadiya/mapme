@@ -1,47 +1,59 @@
-import { create } from "zustand";
-import { persist } from "zustand/middleware";
+"use client"
 import { useSession, signIn, signOut } from "next-auth/react";
+import { create } from "zustand";
+import { createJSONStorage, persist } from "zustand/middleware";
 import { useEffect, useState } from "react";
 import { Toast } from "@/components/customToast";
 import { AuthState } from "@/types";
 
-const useHydrated = () => {
-    const [hydrated, setHydrated] = useState(false);
-    useEffect(() => setHydrated(true), []);
-    return hydrated;
-};
-
-export const useAuth = create<AuthState>()(
+export const useAuthStore = create<AuthState>()(
     persist(
         (set) => ({
+            session: null,
+            status: "loading",
             hasShownToast: false,
+            setSession: (session) => set({ session }),
+            setStatus: (status) => set({ status }),
             setHasShownToast: (value) => set({ hasShownToast: value }),
         }),
         {
             name: "auth-storage",
+            storage: createJSONStorage(() => localStorage)
         }
     )
 );
 
-export const useSyncAuth = () => {
+export const useAuthSync = () => {
     const { data: session, status } = useSession();
-    const hasShownToast = useAuth((state) => state.hasShownToast);
-    const setHasShownToast = useAuth((state) => state.setHasShownToast);
-
-    const hydrated = useHydrated();
+    const { setSession, setStatus, setHasShownToast, hasShownToast } = useAuthStore();
+    const [isHydrated, setIsHydrated] = useState<boolean>(false)
 
     useEffect(() => {
-        if (!hydrated || status === "loading") return;
+        setIsHydrated(true)
+    }, [])
 
-        if (session?.user) {
+    useEffect(() => {
+        if (!isHydrated) return;
+
+        if (status === 'authenticated' && session) {
             if (!hasShownToast) {
-                Toast.success("Login Successful!");
-                setHasShownToast(true);
+                Toast.success("Login Successful!")
+                setHasShownToast(true)
             }
-        } else {
-            setHasShownToast(false);
+            setSession(session)
+            setStatus(status)
         }
-    }, [session, status, hasShownToast, setHasShownToast, hydrated]);
 
-    return { signIn, signOut };
+        if (status === 'unauthenticated') {
+            setStatus(status)
+            setHasShownToast(false)
+        }
+    }, [session, status, isHydrated, hasShownToast, setSession, setStatus, setHasShownToast]);
+
+    return {
+        session: useAuthStore((state) => state.session),
+        status: useAuthStore((state) => state.status),
+        signIn,
+        signOut,
+    };
 };
