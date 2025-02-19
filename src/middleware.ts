@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { getAuthSession } from "./lib/getAuthSession";
 
 export async function middleware(req: NextRequest) {
     try {
-        const session = await getAuthSession()
-        if (!session) {
+        const sessionToken = req.cookies.get("next-auth-session-token")?.value || req.cookies.get("__Secure-next-auth.session-token")?.value;
+
+        if (!sessionToken) {
             console.warn("Middleware: No session found, redirecting ...")
             return NextResponse.redirect(new URL("/", req.url))
         }
