@@ -5,6 +5,7 @@ import "@/styles/main.css"
 import { ToasterWrapper } from "@/components/customToast";
 import { getAuthSession } from "@/lib/getAuthSession";
 import Provider from "@/Provider";
+import Navbar from "@/components/navbar";
 
 const inter = Inter({ subsets: ["latin"] })
 export const metadata: Metadata = {
@@ -15,10 +16,11 @@ export const metadata: Metadata = {
 export default async function RootLayout({ children }: Readonly<ChildrenProps>) {
   const session = await getAuthSession()
   return (
-    <html lang="en" className="dark">
-      <body className={`${inter.className} bg-background text-foreground antialiased`}>
+    <html lang="en" className="dark" suppressHydrationWarning>
+      <body className={`${inter.className} bg-background text-foreground antialiased hide-scrollbar`}>
         <Provider session={session}>
           <ToasterWrapper />
+          <Navbar />
           {children}
         </Provider>
       </body>
