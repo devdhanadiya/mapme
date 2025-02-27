@@ -17,14 +17,9 @@ export default function ProgressSection({
     onDeleteAll = () => { },
 }: ProgressSectionProps) {
     return (
-        <div className="w-full h-full px-6 py-4">
-            <h2 className="text-2xl font-semibold text-white mb-4">Progress</h2>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 h-[calc(100%-3rem)]">
-                {/* Progress Bar Section */}
-                <ProgressBar />
-
-                {/* Action Center */}
+        <div className="w-full h-full p-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 h-full">
+                <ProgressBar totalTasks={totalTasks} completedTasks={completedTasks} />
                 <ActionCenter onMarkAllDone={onMarkAllDone} onDeleteAll={onDeleteAll} />
             </div>
         </div>

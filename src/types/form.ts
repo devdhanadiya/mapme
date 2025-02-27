@@ -37,5 +37,4 @@ export interface TodoCardProps {
     onDelete?: (id: string) => void
     onEdit?: (id: string, data: CardDataProp) => void
     onComplete?: (id: string, completed: boolean) => void
-    key?: number
 }
