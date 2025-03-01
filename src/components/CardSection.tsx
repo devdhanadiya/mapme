@@ -5,7 +5,6 @@ import { TodoCard } from "./TodoCard"
 import { AddTodoCard } from "./AddTodoCard"
 import { CardDataProp } from "@/types/form"
 
-// Sample data for demonstration
 const initialTodos = [
     {
         id: "1",
