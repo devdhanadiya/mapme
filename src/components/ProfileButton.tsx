@@ -28,7 +28,7 @@ export default function ProfileButton() {
             <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-10 w-10 rounded-full">
                     <Avatar className="h-10 w-10">
-                        <AvatarImage src={session?.user?.image || ""} alt={session?.user?.name || ""} />
+                        <AvatarImage src={session?.user?.image || "/avatar.ping"} alt={session?.user?.name || ""} />
                         <AvatarFallback>{session?.user?.name?.charAt(0) || "U"}</AvatarFallback>
                     </Avatar>
                 </Button>

@@ -4,7 +4,7 @@ import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { useEffect, useState } from "react";
 import { Toast } from "@/components/customToast";
-import { AuthState } from "@/types";
+import { AuthState } from "@/types/storeTypes";
 
 export const useAuthStore = create<AuthState>()(
     persist(

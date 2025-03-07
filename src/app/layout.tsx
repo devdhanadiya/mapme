@@ -3,7 +3,7 @@ import { ChildrenProps } from "@/types";
 import { Inter } from "next/font/google"
 import "@/styles/main.css"
 import { ToasterWrapper } from "@/components/customToast";
-import { getAuthSession } from "@/lib/getAuthSession";
+import { getAuthSession } from "@/lib/auth";
 import Provider from "@/Provider";
 import Navbar from "@/components/navbar";
 

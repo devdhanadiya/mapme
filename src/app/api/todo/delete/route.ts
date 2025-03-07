@@ -10,7 +10,7 @@ export async function DELETE(req: NextRequest) {
         const { success, data, error } = deleteTodoSchema.safeParse({ todoId })
         if (!success) {
             console.log(error.message)
-            return NextResponse.json({ message: "Invaild url parameter 'todoId'" }, { status: 400 })
+            return NextResponse.json({ message: "Invalid url parameter 'todoId'" }, { status: 400 })
         }
 
         const result = await prisma.todo.delete({
