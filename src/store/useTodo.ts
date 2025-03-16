@@ -42,31 +42,20 @@ export const useTodo = create<TodoStore>((set) => ({
     },
 
     addTodo: async (data) => {
-        set((state) => ({
-            todos: [...state.todos, { id: "temp-id", ...data, status: false }], // Optimistic update
-            loading: true,
-            error: null,
-        }));
+        set({ loading: true, error: null, success: false })
         try {
-            const res = await api.post<{ data: ITodo }>("/api/todo/create", data);
-            set((state) => ({
-                todos: state.todos.map((todo) =>
-                    todo.id === "temp-id" ? res.data.data : todo
-                ),
-                loading: false,
-                success: true,
-            }));
+            await api.post<Omit<ApiResponse, "data">>("/api/todo/create", data)
+            await useTodo.getState().getTodos()
+            set({ loading: false, success: true })
         } catch (error) {
             console.error("AddTodo Error:", error);
-            set((state) => ({
-                todos: state.todos.filter((todo) => todo.id !== "temp-id"), // Rollback on failure
+            set({
                 loading: false,
                 error: "Failed to add todo!",
-            }));
-        }
-        await useTodo.getState().getTodos(); // Background refetch
-    },
+            });
 
+        }
+    },
 
 
     editTodo: async (id, data) => {

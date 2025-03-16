@@ -34,6 +34,7 @@ export interface TodoCardProps {
     title: string
     description: string
     dueTime: Date
+    status?: boolean
     onDelete?: (id: string) => void
     onEdit?: (id: string, data: CardDataProp) => void
     onComplete?: (id: string, status: boolean) => void
