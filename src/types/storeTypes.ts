@@ -28,8 +28,8 @@ export interface TodoStore {
     success: boolean;
     isFetched: boolean;
     getTodos: () => Promise<void>;
-    addTodo: (data: ITodoWithoutId) => void;
-    editTodo: (id: string, data: Partial<ITodoWithoutId>) => void;
+    addTodo: (data: Omit<ITodoWithoutId, "status">) => void;
+    editTodo: (id: string, data: Partial<ITodoWithoutId>) => Promise<void>;
     deleteTodo: (id: string) => void;
     completeTodo: (id: string, status: boolean) => void;
 }

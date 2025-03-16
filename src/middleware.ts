@@ -3,10 +3,14 @@ import type { NextRequest } from "next/server";
 
 export async function middleware(req: NextRequest) {
     try {
-        const sessionToken = req.cookies.get("next-auth-session-token")?.value || req.cookies.get("__Secure-next-auth.session-token")?.value;
+        const sessionToken = req.cookies.get("next-auth-session-token")?.value
+            || req.cookies.get("__Secure-next-auth.session-token")?.value;
 
         if (!sessionToken) {
-            console.warn("Middleware: No session found, redirecting ...")
+            console.warn("Middleware: No session found")
+            if (req.nextUrl.pathname.startsWith("/api")) {
+                return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+            }
             return NextResponse.redirect(new URL("/", req.url))
         }
         return NextResponse.next()

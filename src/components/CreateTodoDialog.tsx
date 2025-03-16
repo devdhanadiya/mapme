@@ -25,7 +25,7 @@ export function CreateTodoDialog({ open, onOpenChange, onSave }: CreateTodoDialo
         defaultValues: {
             title: "",
             description: "",
-            dueTime: new Date(), // Ensure Date type for DatePicker
+            dueTime: new Date(), // Date type for DatePicker
         },
     });
 

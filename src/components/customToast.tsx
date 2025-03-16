@@ -6,7 +6,7 @@ import { IToast } from "@/types"
 import { CheckCircle, XCircle, AlertTriangle, X } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 
-const time = { duration: 3000 }
+const time = { duration: 2000 }
 
 const ToastMessage = ({ type, message, t }: IToast) => {
     const [isVisible, setIsVisible] = useState(false)

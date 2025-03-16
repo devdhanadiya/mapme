@@ -1,6 +1,7 @@
-import api from "@/lib/axios"
-import { TodoStore, ITodo, ApiResponse } from "@/types/storeTypes"
-import { create } from "zustand"
+import api from "@/lib/axios";
+import { TodoStore, ApiResponse, ITodo, ITodoWithoutId } from "@/types/storeTypes";
+import { create } from "zustand";
+import { isAxiosError } from "axios";
 
 export const useTodo = create<TodoStore>((set) => ({
     todos: [],
@@ -10,97 +11,114 @@ export const useTodo = create<TodoStore>((set) => ({
     isFetched: false,
 
     getTodos: async () => {
-        set({ loading: true, error: null, success: false })
+        set({ loading: true, error: null, success: false });
 
         try {
-            const res = await api.get<ApiResponse>(`/api/todo/get`)
+            const res = await api.get<ApiResponse>("/api/todo/get");
             set({
                 todos: res.data.data ?? [],
                 loading: false,
                 success: true,
-                isFetched: true
-            })
+                isFetched: true,
+            });
         } catch (error) {
-            set({
-                todos: [],
-                loading: false,
-                error: "Failed to fetch todos!",
-                isFetched: true
-            })
-            console.error("GetTodos Error: ", error)
+            if (isAxiosError(error) && error.response?.status === 404) {
+                set({
+                    todos: [],
+                    loading: false,
+                    success: true,
+                    isFetched: true,
+                });
+            } else {
+                set({
+                    todos: [],
+                    loading: false,
+                    error: "Failed to fetch todos!",
+                    isFetched: true,
+                });
+                console.error("GetTodos Error: ", error);
+            }
         }
     },
 
     addTodo: async (data) => {
-        set({ loading: true, error: null, success: false })
+        set((state) => ({
+            todos: [...state.todos, { id: "temp-id", ...data, status: false }], // Optimistic update
+            loading: true,
+            error: null,
+        }));
         try {
-            await api.post<Omit<ApiResponse, "data">>("/api/todo/create", data)
-            await useTodo.getState().getTodos()
-            set({ loading: false, success: true })
-        } catch (error) {
-            console.error("AddTodo Error:", error);
-            set({
-                loading: false,
-                error: "Failed to add todo!",
-            });
-
-        }
-    },
-
-    editTodo: async (id, data) => {
-        set({ loading: true, error: null })
-        try {
-            await api.patch(`/api/todo/update?todoId=${id}`, data)
+            const res = await api.post<{ data: ITodo }>("/api/todo/create", data);
             set((state) => ({
-                todos: state.todos.map((todo) => todo.id === id ? { ...todo, ...data } : todo),
+                todos: state.todos.map((todo) =>
+                    todo.id === "temp-id" ? res.data.data : todo
+                ),
                 loading: false,
                 success: true,
-            }))
+            }));
         } catch (error) {
-            console.log("EditTodo Error: ", error)
-            set({
+            console.error("AddTodo Error:", error);
+            set((state) => ({
+                todos: state.todos.filter((todo) => todo.id !== "temp-id"), // Rollback on failure
                 loading: false,
-                error: "Failed to update todo!",
-            })
+                error: "Failed to add todo!",
+            }));
+        }
+        await useTodo.getState().getTodos(); // Background refetch
+    },
+
+
+
+    editTodo: async (id, data) => {
+        set((state) => ({
+            todos: state.todos.map((todo) =>
+                todo.id === id ? { ...todo, ...data } : todo
+            ),
+            loading: true,
+            error: null,
+        }));
+
+        try {
+            await api.patch("/api/todo/update", { id, ...data });
+            set({ loading: false, success: true });
+        } catch (error) {
+            console.error("EditTodo Error: ", error);
+            set({ loading: false, error: "Failed to update todo!" });
         }
     },
 
     deleteTodo: async (id) => {
-        set({ loading: true, error: null })
+        const prevTodos = useTodo.getState().todos;
+        set((state) => ({
+            todos: state.todos.filter((todo) => todo.id !== id),
+            loading: true,
+            error: null,
+        }));
+
         try {
-            await api.delete(`/api/todo/delete?todoId=${id}`)
-            set((state) => ({
-                todos: state.todos.filter((todo) => todo.id !== id),
-                loading: false,
-                success: true
-            }))
+            await api.delete(`/api/todo/delete?todoId=${id}`);
+            set({ loading: false, success: true });
         } catch (error) {
-            console.error("DeleteTodo Error: ", error)
-            set({
-                loading: false,
-                error: "Failed to delete Todo!"
-            })
+            console.error("DeleteTodo Error: ", error);
+            set({ todos: prevTodos, loading: false, error: "Failed to delete todo!" });
         }
     },
+
     completeTodo: async (id, status) => {
         set((state) => ({
-            ...state,
-            todos: state.todos.map(todo => todo.id == id ? { ...todo, status } : todo),
+            todos: state.todos.map((todo) =>
+                todo.id === id ? { ...todo, status } : todo
+            ),
             loading: true,
-            error: null
-        }))
+            error: null,
+        }));
 
         try {
-            await api.patch(`/api/todo/status`, { id, status })
-            set({ loading: false, success: true })
+            await api.patch("/api/todo/update", { id, status });
+            set({ loading: false, success: true });
         } catch (error) {
-            console.error("Could'nt mark todo as done: ", error)
-
-            set((state) => ({
-                ...state,
-                loading: false,
-                error: "Failed to Marks status of Todo!"
-            }))
+            console.error("Could'nt mark todo as done: ", error);
+            set({ loading: false, error: "Failed to mark status of Todo!" });
         }
-    }
-}))
+    },
+}));

@@ -17,8 +17,3 @@ export interface IToast {
 export interface ProviderProps extends ChildrenProps {
     session: SessionType
 }
-
-export interface DateFormatProps {
-    date: string | Date,
-    parser: "locale" | "json"
-}

@@ -1,56 +1,47 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { TodoCard } from "./TodoCard"
 import { AddTodoCard } from "./AddTodoCard"
+import { useTodo } from "@/store/useTodo"
 import { CardDataProp } from "@/types/form"
-
-const initialTodos = [
-    {
-        id: "1",
-        title: "Complete Project",
-        description: "Finish the dashboard implementation with all required features.",
-        dueTime: new Date(),
-    },
-    {
-        id: "2",
-        title: "Team Meeting",
-        description: "Weekly sync with the development team to discuss progress.",
-        dueTime: new Date(),
-    },
-]
+import { DateParser } from "@/util/dateFormatter"
+import { Toast } from "./customToast"
 
 export default function CardSection() {
-    const [todos, setTodos] = useState(initialTodos)
+    const { todos, addTodo, editTodo, getTodos, completeTodo, deleteTodo, isFetched } = useTodo()
 
-    const handleAddTodo = (data: CardDataProp) => {
-        const newTodo = {
-            id: Date.now().toString(),
-            ...data,
+    useEffect(() => {
+        if (!todos.length) {
+            getTodos()
         }
-        setTodos((prevTodos) => [...prevTodos, newTodo])
+    }, [getTodos, todos.length])
+
+    const handleAddTodo = async (data: CardDataProp) => {
+        addTodo({
+            ...data,
+            dueTime: DateParser(data.dueTime),
+        })
+        Toast.success("Created Todo!")
     }
 
-    const handleEditTodo = (id: string, data: CardDataProp) => {
-        setTodos((prevTodos) => prevTodos.map((todo) => (todo.id === id ? { ...todo, ...data } : todo)))
+    const handleEditTodo = async (id: string, todo: CardDataProp) => {
+        await editTodo(id, {
+            title: todo.title,
+            description: todo.description,
+            dueTime: DateParser(todo.dueTime)
+        })
+        Toast.success("Edited Todo!")
+    }
+
+    const handleCompleteTodo = (id: string, status: boolean) => {
+        completeTodo(id, status)
+        Toast.success(`Marked Todo as ${status ? "completed" : "incomplete"}!`)
     }
 
     const handleDeleteTodo = (id: string) => {
-        setTodos((prevTodos) => {
-            const todoToDelete = prevTodos.find((todo) => todo.id === id)
-            if (!todoToDelete) return prevTodos
-
-            setTimeout(() => {
-                setTodos((current) => current.filter((todo) => todo.id !== id))
-            }, 200)
-
-            return prevTodos.map((todo) => (todo.id === id ? { ...todo, isDeleting: true } : todo))
-        })
-    }
-
-    const handleCompleteTodo = (id: string, completed: boolean) => {
-        console.log(`Todo ${id} marked as ${completed ? "completed" : "incomplete"}`)
-        setTodos((prevTodos) => prevTodos.map((todo) => (todo.id === id ? { ...todo, completed } : todo)))
+        deleteTodo(id)
+        Toast.success("Deleted Todo!")
     }
 
     return (
@@ -68,7 +59,7 @@ export default function CardSection() {
                             dueTime={new Date(todo.dueTime)}
                             onEdit={handleEditTodo}
                             onDelete={handleDeleteTodo}
-                            onComplete={handleCompleteTodo}
+                            onComplete={() => handleCompleteTodo(todo.id, !todo.status)}
                         />
                     </div>
                 ))}
