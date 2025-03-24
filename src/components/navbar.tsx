@@ -14,8 +14,7 @@ export default function Navbar() {
           <Link href="/dashboard" className="text-gray-400 transition-colors hover:text-primary">
             Dashboard
           </Link>
-          <Link href="/learn-more"
-            className="text-gray-400 transition-colors hover:text-primary">
+          <Link href="/learn-more" className="text-gray-400 transition-colors hover:text-primary">
             About Project
           </Link>
         </nav>

@@ -83,7 +83,7 @@
   }
 
   .hide-scrollbar {
-    -ms-overflow-style: none
+    -ms-overflow-style: none;
   }
 }
 
@@ -119,7 +119,10 @@
 }
 
 .animate-in {
-  animation: fadeIn 0.3s ease-out, slideUp 0.3s ease-out, scaleIn 0.3s ease-out;
+  animation:
+    fadeIn 0.3s ease-out,
+    slideUp 0.3s ease-out,
+    scaleIn 0.3s ease-out;
 }
 
 .fade-in {
@@ -129,7 +132,6 @@
 .slide-in-from-bottom-2 {
   animation: slideUp 0.3s ease-out;
 }
-
 
 @layer base {
   * {

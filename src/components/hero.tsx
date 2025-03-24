@@ -7,15 +7,15 @@ import { useAuthSync } from "@/store/useAuth";
 import Link from "next/link";
 
 export default function Hero() {
-  const { status, signIn } = useAuthSync()
-  const router = useRouter()
+  const { status, signIn } = useAuthSync();
+  const router = useRouter();
 
   const handleClick = async () => {
-    if (status != "authenticated") {
-      await signIn("google")
+    if (status !== "authenticated") {
+      await signIn("google");
     }
-    router.push("/dashboard")
-  }
+    router.push("/dashboard");
+  };
 
   return (
     <section className="container flex min-h-[calc(100vh-3.5rem)] max-w-screen-2xl flex-col items-center justify-center space-y-8 py-24 text-center md:py-32">
@@ -37,9 +37,7 @@ export default function Hero() {
           <ArrowRight className="ml-2 h-4 w-4" />
         </Button>
         <Button variant="outline" size="lg">
-          <Link href="/learn-more">
-            Learn More
-          </Link>
+          <Link href="/learn-more">Learn More</Link>
         </Button>
       </div>
     </section>

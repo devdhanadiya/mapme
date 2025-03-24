@@ -17,6 +17,9 @@ export default async function RootLayout({ children }: Readonly<ChildrenProps>) 
   const session = await getAuthSession();
   return (
     <html lang="en" className="dark" suppressHydrationWarning>
+      <head>
+        <link rel="icon" href="/favicon.png" sizes="any" />
+      </head>
       <body
         className={`${inter.className} bg-background text-foreground antialiased hide-scrollbar`}
       >

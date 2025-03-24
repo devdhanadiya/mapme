@@ -27,18 +27,21 @@
 ## ⚙️ Setup & Installation
 
 1️⃣ **Clone the repository**
+
 ```bash
  git clone https://github.com/your-username/mapme.git
  cd mapme
 ```
 
 2️⃣ **Install dependencies**
+
 ```bash
 pnpm install
 ```
 
 3️⃣ **Setup environment variables**
 Create a `.env` file in the root directory and add:
+
 ```env
 DATABASE_URL=
 
@@ -50,11 +53,13 @@ NEXTAUTH_SECRET=
 ```
 
 4️⃣ **Run database migrations**
+
 ```bash
 pnpm prisma migrate dev
 ```
 
 5️⃣ **Start the development server**
+
 ```bash
 pnpm dev
 ```
@@ -74,4 +79,3 @@ This project is licensed under the **MIT License**. Feel free to use and modify 
 ---
 
 🎯 Happy Coding! 🚀
-
